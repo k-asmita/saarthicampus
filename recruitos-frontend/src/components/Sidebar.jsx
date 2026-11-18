@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   LayoutDashboard,
   GraduationCap,
@@ -17,7 +18,9 @@ import {
   GitBranch,
   Search,
   CheckCircle2,
-  ClipboardList
+  ClipboardList,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 
 const NAV = {
@@ -86,11 +89,28 @@ const NAV = {
 };
 
 export default function Sidebar({ activePage, setActivePage, role = 'admin', className = '' }) {
+  const [collapsed, setCollapsed] = useState(false);
   const nav = NAV[role] || NAV.admin;
+
   return (
-    <aside className={`sidebar ${className}`} role="navigation" aria-label="Sidebar navigation">
+    <aside
+      className={`sidebar ${collapsed ? 'collapsed' : ''} ${className}`}
+      role="navigation"
+      aria-label="Sidebar navigation"
+    >
+      <button
+        type="button"
+        className="side-toggle"
+        onClick={() => setCollapsed((c) => !c)}
+        aria-label={collapsed ? 'Open sidebar' : 'Close sidebar'}
+        aria-expanded={!collapsed}
+        title={collapsed ? 'Open sidebar' : 'Close sidebar'}
+      >
+        {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+      </button>
+
       {nav.map((group) => (
-        <div key={group.section}>
+        <div key={group.section} className="side-group">
           <div className="side-section-label">{group.section}</div>
           {group.items.map((item) => {
             const Icon = item.icon;
@@ -99,6 +119,8 @@ export default function Sidebar({ activePage, setActivePage, role = 'admin', cla
                 key={item.key}
                 role="button"
                 tabIndex={0}
+                title={collapsed ? item.label : undefined}
+                aria-label={collapsed ? item.label : undefined}
                 aria-current={activePage === item.key ? 'page' : undefined}
                 className={`side-link ${activePage === item.key ? 'active' : ''}`}
                 onClick={() => setActivePage(item.key)}
